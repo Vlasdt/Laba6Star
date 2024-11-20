@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 namespace Laba2
@@ -140,7 +141,7 @@ namespace Laba2
                             float[] floatArray = new float[line.Length - 1];
                             for (int i = 1; i < line.Length; i++)
                             {
-                                floatArray[i - 1] = float.Parse(line[i]);
+                                floatArray[i - 1] = float.Parse(line[i], CultureInfo.InvariantCulture);
                             }
                             if (line[0] == "sorted")
                             {
