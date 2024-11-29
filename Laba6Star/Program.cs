@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
+using static Laba2.Program;
+
 
 namespace Laba2
 {
     internal class Program
     {
-        public class TArray<T> where T : IComparable<T>
+        public class TArray<T> where T : IComparable<T> 
         {
             public T[] Array { get; private set; }
             public int Length { get; private set; }
@@ -75,6 +76,8 @@ namespace Laba2
                     }
                 }
             }
+
+
         }
 
         public class TArrayContainer
@@ -101,6 +104,12 @@ namespace Laba2
                 Arrays.Add(new TArray<float>(array));
             }
 
+            public void DeleteArray(int i)
+            {
+                object t = Arrays[i];
+                Arrays.Remove(t);
+            }
+
             public TArrayContainer(string fileName)
             {
                 string[] line;
@@ -112,7 +121,7 @@ namespace Laba2
 
                         for (int i = 1; i < line.Length; i++)
                         {
-                            if (!int.TryParse(line[i], out _))
+                            if (line[i].Contains(","))
                             {
                                 isIntArray = false;
                                 break;
@@ -141,7 +150,7 @@ namespace Laba2
                             float[] floatArray = new float[line.Length - 1];
                             for (int i = 1; i < line.Length; i++)
                             {
-                                floatArray[i - 1] = float.Parse(line[i], CultureInfo.InvariantCulture);
+                                floatArray[i - 1] = float.Parse(line[i]);
                             }
                             if (line[0] == "sorted")
                             {
@@ -156,6 +165,7 @@ namespace Laba2
                 }
             }
 
+
             public override string ToString()
             {
                 string result = "";
@@ -165,14 +175,64 @@ namespace Laba2
                 }
                 return result;
             }
+            public delegate bool CompareTarray(object a, object b);
+            public void DeleteRep(CompareTarray compare)
+            {
+                for (int i = 0; i < Arrays.Count - 1; i++)
+                {
+                    for (int j = Arrays.Count - 1; j > i; j--)
+                    {
+                        if (compare(Arrays[i], Arrays[j]))
+                        {
+                            DeleteArray(j);
+                        }
+                    }
+                }
+            }
+
+
         }
+
 
         private static void Main()
         {
             var container = new TArrayContainer(@"C:\Users\user\source\repos\Laba6Star\Laba6Star\array.txt");
             Console.WriteLine(container);
 
+            container.DeleteRep((a, b) =>
+            {
+                if (a is TArray<int> arrayA && b is TArray<int> arrayB)
+                {
+                    
+                    if (arrayA.Length != arrayB.Length) return false;
+
+                    
+                    for (int i = 0; i < arrayA.Length; i++)
+                    {
+                        if (arrayA[i].CompareTo(arrayB[i]) != 0) return false;
+                    }
+                    return true;
+                }
+                else if (a is TArray<float> arrayF1 && b is TArray<float> arrayF2)
+                {
+                    if (arrayF1.Length != arrayF2.Length) return false;
+
+                    for (int i = 0; i < arrayF1.Length; i++)
+                    {
+                        if (arrayF1[i].CompareTo(arrayF2[i]) != 0) return false;
+                    }
+                    return true;
+                }
+
+                return false; 
+            });
+
+
+
+            Console.WriteLine(container);
             Console.ReadKey();
         }
+
+
     }
 }
